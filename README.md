@@ -1,7 +1,7 @@
 sysminerd
 =========
 
-sysminerd is a Go daemon that collects, transforms, and forwards system metrics to other third party systems.  The input, transform, and output modules used are all configurable.  Initial support will focus on cpu, memory, and network input, with output support for graphite.
+sysminerd is a Go daemon that collects, transforms, and forwards system metrics to other third party systems.  The input, transform, and output modules used are all configurable.  Initial support will focus on cpu, memory, and network input, with output support for [graphite](https://github.com/graphite-project/).
 
 # Configuration
 
@@ -23,4 +23,6 @@ A transform module can specify a list of input modules that it will mutate.  At 
 
 Output modules are used for sending system metrics to other third party systems.  At launch they will be initialized with their configuration details.  After the list of metrics completes the transform stage, the list of metrics will be sent to the output modules.  If an output module cannot send the metrics it should send an error.  The main daemon will queue metrics based on the configuration setting specified.
 
+# Monitoring
 
+The daemon will provide an http API that can easily be queried.  It can return metrics on the daemon itself or metrics that it is collecting.  External monitoring tools can leverage this data also.
