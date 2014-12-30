@@ -1,40 +1,17 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	interval time.Duration
-}
-
-func parseConfig(path string) Config {
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatalf("Error reading config: %v", err)
-	}
-	yamlConfig := make(map[interface{}]interface{})
-
-	err = yaml.Unmarshal(data, &yamlConfig)
-	if err != nil {
-		log.Fatalf("Error parsing yaml: %v", err)
-	}
-
-	interval, ok := yamlConfig["interval"].(int)
-	if !ok || interval < 1 {
-		log.Fatalf("Invalid interval specified: %v", yamlConfig["interval"])
-	}
-
-	config := Config{}
-	config.interval = time.Duration(interval) * time.Second
-	return config
+type Metric struct {
+	name      string
+	value     float64
+	timestamp time.Time
 }
 
 func main() {
@@ -88,6 +65,6 @@ func tickModules(config Config) {
 	// check to make sure the metrics collection isn't taking too long
 	tickTime := time.Since(start).Seconds()
 	if tickTime >= (max * .9) {
-		log.Println("getInputMetrics took %f seconds", tickTime)
+		log.Printf("getInputMetrics took %f seconds", tickTime)
 	}
 }
