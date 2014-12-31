@@ -24,3 +24,5 @@ _testmain.go
 *.prof
 
 sysminerd
+Godeps/_workspace
+.vagrant
