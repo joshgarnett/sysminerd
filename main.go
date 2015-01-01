@@ -9,6 +9,7 @@ import (
 )
 
 type Metric struct {
+	module    string
 	name      string
 	value     float64
 	timestamp time.Time
@@ -18,6 +19,10 @@ func main() {
 	config := parseConfig("config/sysminerd.yaml")
 
 	//initialize all modules
+	modules := Modules{}
+
+	modules.inputModules = append(modules.inputModules, CPUInputModule{})
+	modules.outputModules = append(modules.outputModules, GraphiteOutputModule{})
 
 	//start loop
 	ticker := time.NewTicker(config.interval)
@@ -26,7 +31,7 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				tickModules(config)
+				tickModules(config, &modules)
 			case <-quit:
 				ticker.Stop()
 				return
@@ -52,15 +57,44 @@ func main() {
 	select {}
 }
 
-func tickModules(config Config) {
+func tickModules(config Config, modules *Modules) {
 	var max = config.interval.Seconds()
 	var start = time.Now()
 
+	allMetrics := []Metric{}
+
 	// get metrics
+	for _, e := range modules.inputModules {
+		module, ok := e.(InputModule)
+		if !ok {
+			log.Printf("%s is not an InputModule", e.Name())
+		} else {
+			metrics, err := module.GetMetrics()
+			if err != nil {
+				log.Printf("There was a problem getting metrics for %s, %v", e.Name(), err)
+			} else {
+				allMetrics = append(allMetrics, metrics...)
+			}
+		}
+	}
 
 	// transform metrics
+	for _, e := range modules.transformModules {
+		_, ok := e.(TransformModule)
+		if !ok {
+			log.Printf("%s is not an TransformModule", e.Name())
+		}
+	}
 
 	// send metrics
+	for _, e := range modules.outputModules {
+		module, ok := e.(OutputModule)
+		if !ok {
+			log.Printf("%s is not an OutputModule", e.Name())
+		} else {
+			module.SendMetrics(allMetrics)
+		}
+	}
 
 	// check to make sure the metrics collection isn't taking too long
 	tickTime := time.Since(start).Seconds()

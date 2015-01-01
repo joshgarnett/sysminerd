@@ -1,15 +1,25 @@
 package main
 
+type Modules struct {
+	inputModules     []Module
+	transformModules []Module
+	outputModules    []Module
+}
+
 type Module interface {
-	init(config map[interface{}]interface{}) error
-	name() string
-	tearDown() error
+	Init(config map[interface{}]interface{}) error
+	Name() string
+	TearDown() error
+}
+
+type TransformModule interface {
+	TransformMetrics(metrics []Metric) ([]Metric, error)
 }
 
 type InputModule interface {
-	getMetrics() ([]Metric, error)
+	GetMetrics() ([]Metric, error)
 }
 
 type OutputModule interface {
-	sendMetrics(metrics []Metric) ([]Metric, error)
+	SendMetrics(metrics []Metric) ([]Metric, error)
 }
