@@ -87,7 +87,7 @@ func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 				niceMetric := Metric{
 					module:    m.Name(),
 					name:      fmt.Sprintf("%s.%s", cpu, name),
-					value:     value / totalDiff,
+					value:     (value / totalDiff) * 100,
 					timestamp: now,
 				}
 				metrics = append(metrics, niceMetric)
