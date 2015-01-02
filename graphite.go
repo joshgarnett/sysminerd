@@ -10,16 +10,19 @@ import (
 	"time"
 )
 
-var graphitePrefix string
-var graphiteConnection net.Conn
+type GraphiteOutputModule struct {
+	prefix   string
+	hostname string
+	port     int64
+	protocol string
+	conn     net.Conn
+}
 
-type GraphiteOutputModule struct{}
-
-func (m GraphiteOutputModule) Name() string {
+func (m *GraphiteOutputModule) Name() string {
 	return "graphite"
 }
 
-func (m GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
+func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
 	var hostname string
 	var err error
 
@@ -40,7 +43,7 @@ func (m GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) e
 
 	// replace periods in the fqdn with underscores
 	hostname = strings.Replace(hostname, ".", "_", -1)
-	graphitePrefix = fmt.Sprintf("sysminerd.%s", hostname)
+	graphitePrefix := fmt.Sprintf("sysminerd.%s", hostname)
 
 	// parse graphite settings
 	graphiteHostname := moduleConfig.Settings["hostname"]
@@ -48,7 +51,7 @@ func (m GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) e
 		log.Fatal("hostname must be specified")
 	}
 
-	graphitePort, err := strconv.ParseInt(moduleConfig.Settings["port"], 10, 32)
+	graphitePort, err := strconv.ParseInt(moduleConfig.Settings["port"], 10, 64)
 	if err != nil {
 		log.Fatalf("Unable to parse port: %v", err)
 	} else if graphitePort < 1 || graphitePort > 65535 {
@@ -62,29 +65,34 @@ func (m GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) e
 
 	// connect to graphite
 	address := fmt.Sprintf("%s:%d", graphiteHostname, graphitePort)
-	graphiteConnection, err = net.DialTimeout(protocol, address, 5*time.Second)
+	graphiteConnection, err := net.DialTimeout(protocol, address, 5*time.Second)
 	if err != nil {
 		//eventually we should just log and then retry later
 		log.Fatalf("Failed to connect to graphite: %v", err)
 	}
 
+	m.prefix = graphitePrefix
+	m.hostname = graphiteHostname
+	m.port = graphitePort
+	m.protocol = protocol
+	m.conn = graphiteConnection
+
 	return nil
 }
 
-func (m GraphiteOutputModule) TearDown() error {
-	return graphiteConnection.Close()
+func (m *GraphiteOutputModule) TearDown() error {
+	return m.conn.Close()
 }
 
-func (m GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
-
+func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
 	// for now just print the metrics
 	for _, metric := range metrics {
-		metricName := fmt.Sprintf("%s.%s.%s", graphitePrefix, metric.module, metric.name)
+		metricName := fmt.Sprintf("%s.%s.%s", m.prefix, metric.module, metric.name)
 
 		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
 		log.Printf("Graphite: %s", graphiteMetric)
 
-		_, err := graphiteConnection.Write([]byte(graphiteMetric))
+		_, err := m.conn.Write([]byte(graphiteMetric))
 		if err != nil {
 			log.Printf("Error sending graphite metric: %v", err)
 		}

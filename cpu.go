@@ -27,19 +27,19 @@ var cpuFields = map[string]int{
 
 type CPUInputModule struct{}
 
-func (m CPUInputModule) Name() string {
+func (m *CPUInputModule) Name() string {
 	return "cpu"
 }
 
-func (m CPUInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
+func (m *CPUInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
 	return nil
 }
 
-func (m CPUInputModule) TearDown() error {
+func (m *CPUInputModule) TearDown() error {
 	return nil
 }
 
-func (m CPUInputModule) GetMetrics() ([]Metric, error) {
+func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 	metrics := make([]Metric, 0, 10)
 
 	b, err := ioutil.ReadFile("/proc/stat")

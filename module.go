@@ -80,9 +80,9 @@ func getModules(config Config) Modules {
 func getModule(name string) Module {
 	switch name {
 	case "cpu":
-		return CPUInputModule{}
+		return &CPUInputModule{}
 	case "graphite":
-		return GraphiteOutputModule{}
+		return &GraphiteOutputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}
