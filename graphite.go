@@ -61,7 +61,7 @@ func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) 
 	}
 
 	protocol := moduleConfig.Settings["protocol"]
-	if protocol != "tcp" {
+	if protocol != "tcp" && protocol != "udp" {
 		log.Fatalf("Graphite protocol %s is not supported", protocol)
 	}
 
