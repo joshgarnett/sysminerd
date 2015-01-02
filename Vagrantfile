@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "ubuntu/trusty64"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -24,8 +24,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 2
   end
 
+  # Setup all go dependencies
   config.vm.provision "shell" do |s|
     s.path = "bin/provision.sh"
     s.privileged = false
+  end
+
+  # Install graphite for testing
+  config.vm.provision "shell" do |s|
+    s.path = "bin/install_graphite.sh"
+    s.privileged = true
   end
 end
