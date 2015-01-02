@@ -27,7 +27,7 @@ type InputModule interface {
 }
 
 type OutputModule interface {
-	SendMetrics(metrics []Metric) ([]Metric, error)
+	SendMetrics(metrics []Metric) error
 }
 
 func getModules(config Config) Modules {

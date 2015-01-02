@@ -11,10 +11,11 @@ import (
 )
 
 type GraphiteOutputModule struct {
-	prefix        string
-	hostname      string
-	port          int64
-	protocol      string
+	Prefix        string
+	Hostname      string
+	Port          int
+	Protocol      string
+	MaxQueueSize  int
 	conn          net.Conn
 	queuedMetrics []Metric
 }
@@ -64,42 +65,57 @@ func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) 
 		log.Fatalf("Graphite protocol %s is not supported", protocol)
 	}
 
-	// connect to graphite
-	graphiteConnection, err := connectToGraphite(graphiteHostname, graphitePort, protocol)
+	maxQueueSize, err := strconv.ParseInt(moduleConfig.Settings["max_queue_size"], 10, 64)
+	if err != nil {
+		maxQueueSize = 0
+	}
 
 	// save config data
-	m.prefix = graphitePrefix
-	m.hostname = graphiteHostname
-	m.port = graphitePort
-	m.protocol = protocol
-	m.conn = graphiteConnection
+	m.Prefix = graphitePrefix
+	m.Hostname = graphiteHostname
+	m.Port = int(graphitePort)
+	m.Protocol = protocol
+	m.MaxQueueSize = int(maxQueueSize)
 
-	return nil
+	// connect to graphite
+	m.conn, err = connectToGraphite(m.Hostname, m.Port, m.Protocol)
+
+	return err
 }
 
 func (m *GraphiteOutputModule) TearDown() error {
-	return m.conn.Close()
+	if m.conn != nil {
+		return m.conn.Close()
+	}
+	return nil
 }
 
-func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
-	connectionFailed := false
-
-	allMetrics := metrics
+func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) error {
+	var err error
 
 	// add queued metrics also
 	if len(m.queuedMetrics) > 0 {
-		allMetrics = append(allMetrics, m.queuedMetrics...)
-		m.queuedMetrics = make([]Metric, 0, 0)
+		metrics = append(m.queuedMetrics, metrics...)
+		m.queuedMetrics = make([]Metric, 0, len(metrics))
+	}
+
+	// attempt to reconnect to graphite
+	if m.conn == nil {
+		graphiteConnection, err := connectToGraphite(m.Hostname, m.Port, m.Protocol)
+		if err == nil {
+			log.Print("Reconnected to graphite")
+			m.conn = graphiteConnection
+		}
 	}
 
 	// for now just print the metrics
-	for _, metric := range allMetrics {
-		if connectionFailed {
+	for _, metric := range metrics {
+		if m.conn == nil {
 			m.queuedMetrics = append(m.queuedMetrics, metric)
 			continue
 		}
 
-		metricName := fmt.Sprintf("%s.%s.%s", m.prefix, metric.module, metric.name)
+		metricName := fmt.Sprintf("%s.%s.%s", m.Prefix, metric.module, metric.name)
 
 		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
 		log.Printf("Graphite: %s", graphiteMetric)
@@ -109,21 +125,22 @@ func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
 			log.Printf("Error sending graphite metric: %v", err)
 			m.queuedMetrics = append(m.queuedMetrics, metric)
 
-			// attempt to reconnect
-			graphiteConnection, err := connectToGraphite(m.hostname, m.port, m.protocol)
-			if err == nil {
-				m.conn = graphiteConnection
-			}
-
-			// don't send any metrics for the rest of this tick
-			connectionFailed = true
+			// close the existing connection
+			m.conn.Close()
+			m.conn = nil
 		}
 	}
 
-	return nil, nil
+	//see if we need to trim the queued metrics
+	if m.MaxQueueSize > 0 && len(m.queuedMetrics) > m.MaxQueueSize {
+		log.Printf("Graphite metric queue overflow, throwing away %d metrics", len(m.queuedMetrics)-m.MaxQueueSize)
+		m.queuedMetrics = m.queuedMetrics[len(m.queuedMetrics)-m.MaxQueueSize:]
+	}
+
+	return err
 }
 
-func connectToGraphite(hostname string, port int64, protocol string) (net.Conn, error) {
+func connectToGraphite(hostname string, port int, protocol string) (net.Conn, error) {
 	address := fmt.Sprintf("%s:%d", hostname, port)
 	conn, err := net.DialTimeout(protocol, address, 5*time.Second)
 	if err != nil {
