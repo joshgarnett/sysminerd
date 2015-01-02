@@ -11,11 +11,12 @@ import (
 )
 
 type GraphiteOutputModule struct {
-	prefix   string
-	hostname string
-	port     int64
-	protocol string
-	conn     net.Conn
+	prefix        string
+	hostname      string
+	port          int64
+	protocol      string
+	conn          net.Conn
+	queuedMetrics []Metric
 }
 
 func (m *GraphiteOutputModule) Name() string {
@@ -64,13 +65,9 @@ func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) 
 	}
 
 	// connect to graphite
-	address := fmt.Sprintf("%s:%d", graphiteHostname, graphitePort)
-	graphiteConnection, err := net.DialTimeout(protocol, address, 5*time.Second)
-	if err != nil {
-		//eventually we should just log and then retry later
-		log.Fatalf("Failed to connect to graphite: %v", err)
-	}
+	graphiteConnection, err := connectToGraphite(graphiteHostname, graphitePort, protocol)
 
+	// save config data
 	m.prefix = graphitePrefix
 	m.hostname = graphiteHostname
 	m.port = graphitePort
@@ -85,18 +82,53 @@ func (m *GraphiteOutputModule) TearDown() error {
 }
 
 func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
+	connectionFailed := false
+
+	allMetrics := metrics
+
+	// add queued metrics also
+	if len(m.queuedMetrics) > 0 {
+		allMetrics = append(allMetrics, m.queuedMetrics...)
+		m.queuedMetrics = make([]Metric, 0, 0)
+	}
+
 	// for now just print the metrics
-	for _, metric := range metrics {
+	for _, metric := range allMetrics {
+		if connectionFailed {
+			m.queuedMetrics = append(m.queuedMetrics, metric)
+			continue
+		}
+
 		metricName := fmt.Sprintf("%s.%s.%s", m.prefix, metric.module, metric.name)
 
 		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
 		log.Printf("Graphite: %s", graphiteMetric)
 
-		_, err := m.conn.Write([]byte(graphiteMetric))
-		if err != nil {
+		n, err := m.conn.Write([]byte(graphiteMetric))
+		if err != nil || n != len(graphiteMetric) {
 			log.Printf("Error sending graphite metric: %v", err)
+			m.queuedMetrics = append(m.queuedMetrics, metric)
+
+			// attempt to reconnect
+			graphiteConnection, err := connectToGraphite(m.hostname, m.port, m.protocol)
+			if err == nil {
+				m.conn = graphiteConnection
+			}
+
+			// don't send any metrics for the rest of this tick
+			connectionFailed = true
 		}
 	}
 
 	return nil, nil
+}
+
+func connectToGraphite(hostname string, port int64, protocol string) (net.Conn, error) {
+	address := fmt.Sprintf("%s:%d", hostname, port)
+	conn, err := net.DialTimeout(protocol, address, 5*time.Second)
+	if err != nil {
+		log.Printf("Failed to connect to graphite: %v", err)
+	}
+
+	return conn, err
 }
