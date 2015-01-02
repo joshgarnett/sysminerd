@@ -7,7 +7,7 @@ type Modules struct {
 }
 
 type Module interface {
-	Init(config map[interface{}]interface{}) error
+	Init(config Config, moduleConfig map[interface{}]interface{}) error
 	Name() string
 	TearDown() error
 }

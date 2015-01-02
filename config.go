@@ -11,6 +11,7 @@ import (
 // Config stores all the config options for sysminerd
 type Config struct {
 	interval time.Duration
+	hostname string
 }
 
 func parseConfig(path string) Config {
@@ -30,7 +31,10 @@ func parseConfig(path string) Config {
 		log.Fatalf("Invalid interval specified: %v", yamlConfig["interval"])
 	}
 
+	hostname, _ := yamlConfig["hostname"].(string)
+
 	config := Config{}
 	config.interval = time.Duration(interval) * time.Second
+	config.hostname = hostname
 	return config
 }
