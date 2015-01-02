@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -18,12 +19,12 @@ func (m GraphiteOutputModule) Name() string {
 	return "graphite"
 }
 
-func (m GraphiteOutputModule) Init(config Config, moduleConfig map[interface{}]interface{}) error {
+func (m GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
 	var hostname string
 	var err error
 
-	if config.hostname != "" {
-		hostname = config.hostname
+	if config.Hostname != "" {
+		hostname = config.Hostname
 	} else {
 		hostname, err = os.Hostname()
 		if err != nil {
@@ -39,11 +40,29 @@ func (m GraphiteOutputModule) Init(config Config, moduleConfig map[interface{}]i
 
 	// replace periods in the fqdn with underscores
 	hostname = strings.Replace(hostname, ".", "_", -1)
-
 	graphitePrefix = fmt.Sprintf("sysminerd.%s", hostname)
 
+	// parse graphite settings
+	graphiteHostname := moduleConfig.Settings["hostname"]
+	if graphiteHostname == "" {
+		log.Fatal("hostname must be specified")
+	}
+
+	graphitePort, err := strconv.ParseInt(moduleConfig.Settings["port"], 10, 32)
+	if err != nil {
+		log.Fatalf("Unable to parse port: %v", err)
+	} else if graphitePort < 1 || graphitePort > 65535 {
+		log.Fatalf("invalid port number: %d", graphitePort)
+	}
+
+	protocol := moduleConfig.Settings["protocol"]
+	if protocol != "tcp" {
+		log.Fatalf("Graphite protocol %s is not supported", protocol)
+	}
+
 	// connect to graphite
-	graphiteConnection, err = net.DialTimeout("tcp", "localhost:2003", 5*time.Second)
+	address := fmt.Sprintf("%s:%d", graphiteHostname, graphitePort)
+	graphiteConnection, err = net.DialTimeout(protocol, address, 5*time.Second)
 	if err != nil {
 		//eventually we should just log and then retry later
 		log.Fatalf("Failed to connect to graphite: %v", err)
@@ -61,7 +80,6 @@ func (m GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
 	// for now just print the metrics
 	for _, metric := range metrics {
 		metricName := fmt.Sprintf("%s.%s.%s", graphitePrefix, metric.module, metric.name)
-		// log.Printf("Graphite: %-30s = %f", metricName, metric.value)
 
 		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
 		log.Printf("Graphite: %s", graphiteMetric)

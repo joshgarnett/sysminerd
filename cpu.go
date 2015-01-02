@@ -31,7 +31,7 @@ func (m CPUInputModule) Name() string {
 	return "cpu"
 }
 
-func (m CPUInputModule) Init(config Config, moduleConfig map[interface{}]interface{}) error {
+func (m CPUInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
 	return nil
 }
 

@@ -18,16 +18,11 @@ type Metric struct {
 func main() {
 	config := parseConfig("config/sysminerd.yaml")
 
-	//initialize all modules
-	modules := Modules{}
-
-	modules.inputModules = append(modules.inputModules, CPUInputModule{})
-	modules.outputModules = append(modules.outputModules, GraphiteOutputModule{})
-
-	initializeModules(config, &modules)
+	//get all modules
+	modules := getModules(config)
 
 	//start loop
-	ticker := time.NewTicker(config.interval)
+	ticker := time.NewTicker(time.Duration(config.Interval) * time.Second)
 	quit := make(chan struct{})
 	go func() {
 		for {
@@ -51,7 +46,9 @@ func main() {
 			//run any cleanup steps
 			close(quit)
 
-			os.Exit(1)
+			tearDownModules(&modules)
+
+			os.Exit(0)
 		}
 	}()
 
@@ -59,49 +56,13 @@ func main() {
 	select {}
 }
 
-// TODO: Modules should be initialized and validated for their type on config load.
-// At this point since we are manually setting up the Modules struct we will use this
-// method to initialize the modules
-func initializeModules(config Config, modules *Modules) {
-	// input modules
-	for _, e := range modules.inputModules {
-		_, ok := e.(InputModule)
-		if !ok {
-			log.Fatalf("%s is not an InputModule", e.Name())
-		} else {
-			e.Init(config, nil)
-		}
-	}
-
-	// transform modules
-	for _, e := range modules.transformModules {
-		_, ok := e.(TransformModule)
-		if !ok {
-			log.Fatalf("%s is not an TransformModule", e.Name())
-		} else {
-			e.Init(config, nil)
-		}
-	}
-
-	// output modules
-	for _, e := range modules.outputModules {
-		_, ok := e.(OutputModule)
-		if !ok {
-			log.Fatalf("%s is not an OutputModule", e.Name())
-		} else {
-			e.Init(config, nil)
-		}
-	}
-}
-
 func tickModules(config Config, modules *Modules) {
-	var max = config.interval.Seconds()
 	var start = time.Now()
 
 	allMetrics := []Metric{}
 
 	// get metrics
-	for _, e := range modules.inputModules {
+	for _, e := range modules.InputModules {
 		module, ok := e.(InputModule)
 		if !ok {
 			log.Printf("%s is not an InputModule", e.Name())
@@ -116,7 +77,7 @@ func tickModules(config Config, modules *Modules) {
 	}
 
 	// transform metrics
-	for _, e := range modules.transformModules {
+	for _, e := range modules.TransformModules {
 		_, ok := e.(TransformModule)
 		if !ok {
 			log.Printf("%s is not an TransformModule", e.Name())
@@ -124,7 +85,7 @@ func tickModules(config Config, modules *Modules) {
 	}
 
 	// send metrics
-	for _, e := range modules.outputModules {
+	for _, e := range modules.OutputModules {
 		module, ok := e.(OutputModule)
 		if !ok {
 			log.Printf("%s is not an OutputModule", e.Name())
@@ -134,8 +95,9 @@ func tickModules(config Config, modules *Modules) {
 	}
 
 	// check to make sure the metrics collection isn't taking too long
+	maxTime := float64(config.Interval) * 0.9
 	tickTime := time.Since(start).Seconds()
-	if tickTime >= (max * .9) {
+	if tickTime >= maxTime {
 		log.Printf("getInputMetrics took %f seconds", tickTime)
 	}
 }
