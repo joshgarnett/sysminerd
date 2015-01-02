@@ -6,9 +6,11 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 var graphitePrefix string
+var graphiteConnection net.Conn
 
 type GraphiteOutputModule struct{}
 
@@ -40,11 +42,18 @@ func (m GraphiteOutputModule) Init(config Config, moduleConfig map[interface{}]i
 
 	graphitePrefix = fmt.Sprintf("sysminerd.%s", hostname)
 
+	// connect to graphite
+	graphiteConnection, err = net.DialTimeout("tcp", "localhost:2003", 5*time.Second)
+	if err != nil {
+		//eventually we should just log and then retry later
+		log.Fatalf("Failed to connect to graphite: %v", err)
+	}
+
 	return nil
 }
 
 func (m GraphiteOutputModule) TearDown() error {
-	return nil
+	return graphiteConnection.Close()
 }
 
 func (m GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
@@ -52,7 +61,15 @@ func (m GraphiteOutputModule) SendMetrics(metrics []Metric) ([]Metric, error) {
 	// for now just print the metrics
 	for _, metric := range metrics {
 		metricName := fmt.Sprintf("%s.%s.%s", graphitePrefix, metric.module, metric.name)
-		log.Printf("Graphite: %-30s = %f", metricName, metric.value)
+		// log.Printf("Graphite: %-30s = %f", metricName, metric.value)
+
+		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
+		log.Printf("Graphite: %s", graphiteMetric)
+
+		_, err := graphiteConnection.Write([]byte(graphiteMetric))
+		if err != nil {
+			log.Printf("Error sending graphite metric: %v", err)
+		}
 	}
 
 	return nil, nil
