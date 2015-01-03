@@ -84,13 +84,13 @@ func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 			for name, index := range cpuFields {
 				value := values[index] - previousCPUStats[cpu][index]
 
-				niceMetric := Metric{
+				metric := Metric{
 					module:    m.Name(),
 					name:      fmt.Sprintf("%s.%s", cpu, name),
 					value:     (value / totalDiff) * 100,
 					timestamp: now,
 				}
-				metrics = append(metrics, niceMetric)
+				metrics = append(metrics, metric)
 			}
 		}
 	}

@@ -81,6 +81,8 @@ func getModule(name string) Module {
 	switch name {
 	case "cpu":
 		return &CPUInputModule{}
+	case "memory":
+		return &MemoryInputModule{}
 	case "graphite":
 		return &GraphiteOutputModule{}
 	default:
