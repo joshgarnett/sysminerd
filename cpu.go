@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-var previousCPUStats map[string][]float64
-
 // CPU Fields for /proc/stat
 var cpuFields = map[string]int{
 	"User":      1,
@@ -25,7 +23,9 @@ var cpuFields = map[string]int{
 	"GuestNice": 10,
 }
 
-type CPUInputModule struct{}
+type CPUInputModule struct {
+	previousCPUStats map[string][]float64
+}
 
 func (m *CPUInputModule) Name() string {
 	return "cpu"
@@ -78,11 +78,11 @@ func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 
 	now := time.Now()
 
-	if previousCPUStats != nil {
+	if m.previousCPUStats != nil {
 		for cpu, values := range cpus {
-			totalDiff := values[0] - previousCPUStats[cpu][0]
+			totalDiff := values[0] - m.previousCPUStats[cpu][0]
 			for name, index := range cpuFields {
-				value := values[index] - previousCPUStats[cpu][index]
+				value := values[index] - m.previousCPUStats[cpu][index]
 
 				metric := Metric{
 					module:    m.Name(),
@@ -95,7 +95,7 @@ func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 		}
 	}
 
-	previousCPUStats = cpus
+	m.previousCPUStats = cpus
 
 	return metrics, nil
 }

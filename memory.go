@@ -22,9 +22,28 @@ func (m *MemoryInputModule) TearDown() error {
 }
 
 func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
-	meminfo := make(map[string]float64)
 	metrics := make([]Metric, 0, 50)
 	now := time.Now()
+
+	meminfo, err := ParseMeminfo("/proc/meminfo")
+	if err != nil {
+		return nil, err
+	}
+
+	used := meminfo["MemTotal"] - (meminfo["MemFree"] + meminfo["Buffers"] + meminfo["Cached"] + meminfo["Slab"])
+
+	metrics = append(metrics, Metric{module: m.Name(), name: "Used", value: used, timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "Free", value: meminfo["MemFree"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "Buffered", value: meminfo["Buffers"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "Cached", value: meminfo["Cached"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "SlabReclaimable", value: meminfo["SReclaimable"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "SlabUnreclaimable", value: meminfo["SUnreclaim"], timestamp: now})
+
+	return metrics, nil
+}
+
+func ParseMeminfo(path string) (map[string]float64, error) {
+	meminfo := make(map[string]float64)
 
 	b, err := ioutil.ReadFile("/proc/meminfo")
 	if err != nil {
@@ -50,14 +69,5 @@ func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
 		}
 	}
 
-	used := meminfo["MemTotal"] - (meminfo["MemFree"] + meminfo["Buffers"] + meminfo["Cached"] + meminfo["Slab"])
-
-	metrics = append(metrics, Metric{module: m.Name(), name: "Used", value: used, timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Free", value: meminfo["MemFree"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Buffered", value: meminfo["Buffers"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Cached", value: meminfo["Cached"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "SlabReclaimable", value: meminfo["SReclaimable"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "SlabUnreclaimable", value: meminfo["SUnreclaim"], timestamp: now})
-
-	return metrics, nil
+	return meminfo, nil
 }
