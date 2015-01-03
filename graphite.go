@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const GraphiteModuleName = "graphite"
+
 type GraphiteOutputModule struct {
 	Prefix        string
 	Hostname      string
@@ -21,7 +23,7 @@ type GraphiteOutputModule struct {
 }
 
 func (m *GraphiteOutputModule) Name() string {
-	return "graphite"
+	return GraphiteModuleName
 }
 
 func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) error {

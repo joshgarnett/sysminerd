@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+const MemoryModuleName = "memory"
+
 type MemoryInputModule struct{}
 
 func (m *MemoryInputModule) Name() string {
-	return "memory"
+	return MemoryModuleName
 }
 
 func (m *MemoryInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {

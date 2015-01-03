@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const CpuModuleName = "cpu"
+
 // CPU Fields for /proc/stat
 var cpuFields = map[string]int{
 	"User":      1,
@@ -28,7 +30,7 @@ type CPUInputModule struct {
 }
 
 func (m *CPUInputModule) Name() string {
-	return "cpu"
+	return CpuModuleName
 }
 
 func (m *CPUInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {

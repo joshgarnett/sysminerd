@@ -8,12 +8,14 @@ import (
 	"time"
 )
 
+const NetworkModuleName = "network"
+
 type NetworkInputModule struct {
 	previousIfaces map[string]map[string]float64
 }
 
 func (m *NetworkInputModule) Name() string {
-	return "network"
+	return NetworkModuleName
 }
 
 func (m *NetworkInputModule) Init(config *Config, moduleConfig *ModuleConfig) error {
