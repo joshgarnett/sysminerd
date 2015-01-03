@@ -22,7 +22,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "./", "/home/vagrant/go/src/github.com/joshgarnett/sysminerd"
 
   config.vm.provider "virtualbox" do |v|
-    v.memory = 512
+    v.memory = 768
     v.cpus = 2
   end
 
@@ -35,6 +35,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Install graphite for testing
   config.vm.provision "shell" do |s|
     s.path = "bin/install_graphite.sh"
+    s.privileged = true
+  end
+
+  # Install graphite for testing
+  config.vm.provision "shell" do |s|
+    s.path = "bin/install_grafana.sh"
     s.privileged = true
   end
 end

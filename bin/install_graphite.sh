@@ -62,10 +62,30 @@ apt-get install -qq -y --force-yes apache2 libapache2-mod-wsgi
 
 a2dissite 000-default
 
-cp /usr/share/graphite-web/apache2-graphite.conf /etc/apache2/sites-available
+cat <<'EOT' > /etc/apache2/sites-available/apache2-graphite.conf
+<VirtualHost *:80>
+	WSGIDaemonProcess _graphite processes=2 threads=2 display-name='%{GROUP}' inactivity-timeout=120 user=_graphite group=_graphite
+	WSGIProcessGroup _graphite
+	WSGIImportScript /usr/share/graphite-web/graphite.wsgi process-group=_graphite application-group=%{GLOBAL}
+	WSGIScriptAlias / /usr/share/graphite-web/graphite.wsgi
+
+	Alias /content/ /usr/share/graphite-web/static/
+	<Location "/content/">
+		SetHandler None
+	</Location>
+
+	ErrorLog ${APACHE_LOG_DIR}/graphite-web_error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/graphite-web_access.log combined
+</VirtualHost>
+EOT
 
 a2ensite apache2-graphite
 
-service apache2 reload
+service apache2 restart
 
 echo "Graphite setup"

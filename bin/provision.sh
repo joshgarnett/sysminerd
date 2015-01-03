@@ -5,6 +5,9 @@ echo "Installing apt packages"
 sudo apt-get update -qq
 sudo apt-get install -qq -y vim curl git mercurial
 
+echo "Remove unneeded packages"
+sudo apt-get remove -qq -y puppet puppet-common chef chef-zero
+
 # Install go
 GO_VERSION="1.4"
 GO_PKG="go${GO_VERSION}.linux-amd64.tar.gz"

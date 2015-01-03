@@ -56,6 +56,8 @@ func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
 	metrics = append(metrics, Metric{module: m.Name(), name: "Free", value: meminfo["MemFree"], timestamp: now})
 	metrics = append(metrics, Metric{module: m.Name(), name: "Buffered", value: meminfo["Buffers"], timestamp: now})
 	metrics = append(metrics, Metric{module: m.Name(), name: "Cached", value: meminfo["Cached"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "SlabReclaimable", value: meminfo["SReclaimable"], timestamp: now})
+	metrics = append(metrics, Metric{module: m.Name(), name: "SlabUnreclaimable", value: meminfo["SUnreclaim"], timestamp: now})
 
 	return metrics, nil
 }
