@@ -1,18 +1,9 @@
 #!/bin/bash
 
-# Install vim
-echo "Installing apt packages"
-sudo apt-get update -qq
-sudo apt-get install -qq -y vim curl git mercurial
-
-echo "Remove unneeded packages"
-sudo apt-get remove -qq -y puppet puppet-common chef chef-zero
-
 # Install go
 GO_VERSION="1.4"
 GO_PKG="go${GO_VERSION}.linux-amd64.tar.gz"
 GO_SHA="cd82abcb0734f82f7cf2d576c9528cebdafac4c6"
-VAGRANT_SU="sudo su - vagrant -c 'echo foo'"
 
 if [ -d "/usr/local/go" ]; then
 	echo "Go is already installed"

@@ -5,42 +5,75 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.define "ubuntu" do |ubuntu|
+    # Every Vagrant virtual environment requires a box to build off of.
+    ubuntu.vm.box = "ubuntu/trusty64"
 
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.50"
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    ubuntu.vm.network "private_network", ip: "192.168.33.50"
 
-  config.vm.hostname = "sysminerd.local"
+    ubuntu.vm.hostname = "sysminerd-ubuntu.local"
 
-  # If true, then any SSH connections made will enable agent forwarding.
-  # Default value: false
-  config.ssh.forward_agent = true
+    # If true, then any SSH connections made will enable agent forwarding.
+    # Default value: false
+    ubuntu.ssh.forward_agent = true
 
-  # Share an additional folder to the guest VM.
-  config.vm.synced_folder "./", "/home/vagrant/go/src/github.com/joshgarnett/sysminerd"
+    # Share an additional folder to the guest VM.
+    ubuntu.vm.synced_folder "./", "/home/vagrant/go/src/github.com/joshgarnett/sysminerd"
 
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 768
-    v.cpus = 2
+    ubuntu.vm.provider "virtualbox" do |v|
+      v.memory = 768
+      v.cpus = 2
+    end
+
+    # Setup all go dependencies
+    ubuntu.vm.provision "shell" do |s|
+      s.path = "bin/ubuntu/provision.sh"
+      s.privileged = true
+    end
+
+    # Install go
+    ubuntu.vm.provision "shell" do |s|
+      s.path = "bin/install_go.sh"
+      s.privileged = false
+    end
+
+    # Install graphite for testing
+    ubuntu.vm.provision "shell" do |s|
+      s.path = "bin/ubuntu/install_graphite.sh"
+      s.privileged = true
+    end
+
+    # Install graphite for testing
+    ubuntu.vm.provision "shell" do |s|
+      s.path = "bin/ubuntu/install_grafana.sh"
+      s.privileged = true
+    end
   end
 
-  # Setup all go dependencies
-  config.vm.provision "shell" do |s|
-    s.path = "bin/provision.sh"
-    s.privileged = false
+  config.vm.define "centos" do |centos|
+    # Every Vagrant virtual environment requires a box to build off of.
+    centos.vm.box = "chef/centos-6.5"
+
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    centos.vm.network "private_network", ip: "192.168.33.51"
+
+    centos.vm.hostname = "sysminerd-centos.local"
+
+    # If true, then any SSH connections made will enable agent forwarding.
+    # Default value: false
+    centos.ssh.forward_agent = true
+
+    # Share an additional folder to the guest VM.
+    centos.vm.synced_folder "./", "/home/vagrant/sysminerd"
+
+    centos.vm.provider "virtualbox" do |v|
+      v.memory = 256
+      v.cpus = 1
+    end
+
   end
 
-  # Install graphite for testing
-  config.vm.provision "shell" do |s|
-    s.path = "bin/install_graphite.sh"
-    s.privileged = true
-  end
-
-  # Install graphite for testing
-  config.vm.provision "shell" do |s|
-    s.path = "bin/install_grafana.sh"
-    s.privileged = true
-  end
 end

@@ -1,7 +1,7 @@
 name: graphite
 enabled: true
 settings:
-  hostname: localhost
+  hostname: 192.168.33.50
   port: 2003
   protocol: tcp
   max_queue_size: 10000

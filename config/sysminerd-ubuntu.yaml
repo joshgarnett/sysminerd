@@ -1,0 +1,3 @@
+interval: 5
+hostname: sysminerd-ubuntu.local
+config_path: config/conf.d

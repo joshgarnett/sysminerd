@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -15,8 +17,22 @@ type Metric struct {
 	timestamp time.Time
 }
 
+var configFile = flag.String("c", "", "config file to use")
+
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
+	os.Exit(2)
+}
+
 func main() {
-	config := parseConfig("config/sysminerd.yaml")
+	flag.Parse()
+
+	if *configFile == "" {
+		usage()
+	}
+
+	config := parseConfig(*configFile)
 
 	//get all modules
 	modules := getModules(config)
