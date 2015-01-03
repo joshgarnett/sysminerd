@@ -45,7 +45,7 @@ func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
 func ParseMeminfo(path string) (map[string]float64, error) {
 	meminfo := make(map[string]float64)
 
-	b, err := ioutil.ReadFile("/proc/meminfo")
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

@@ -83,6 +83,8 @@ func getModule(name string) Module {
 		return &CPUInputModule{}
 	case "memory":
 		return &MemoryInputModule{}
+	case "network":
+		return &NetworkInputModule{}
 	case "graphite":
 		return &GraphiteOutputModule{}
 	default:
