@@ -13,8 +13,6 @@ The main daemon and modules are configured with yaml files.
 
 Input modules are used for collecting system metrics.  At launch they will be initialized with their configuration details.  At the interval specified in the main configuration file the module will be queried for its list of metrics.  The input modules are responsible for setting the correct timestamps associated with the metrics.
 
-TBD: As a design constraint we may require that input modules return metrics in a non-blocking manner.  So the input module would be responsible for maintaining an internal cache that can return its current metrics immediately. 
-
 ## Transform
 
 A transform module can specify a list of input modules that it will mutate.  At launch they will be initialized with their configuration details. After the main daemon receives the list of metrics from the associated input modules they will be sent to the transform module.
