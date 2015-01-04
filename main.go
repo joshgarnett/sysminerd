@@ -77,18 +77,24 @@ func tickModules(config Config, modules *Modules) {
 
 	allMetrics := []Metric{}
 
-	// get metrics
-	for _, e := range modules.InputModules {
-		module, ok := e.(InputModule)
-		if !ok {
-			log.Printf("%s is not an InputModule", e.Name())
-		} else {
-			metrics, err := module.GetMetrics()
-			if err != nil {
-				log.Printf("There was a problem getting metrics for %s, %v", e.Name(), err)
-			} else {
-				allMetrics = append(allMetrics, metrics...)
-			}
+	// send metric requests to the input modules in a non blocking manner
+	for i, c := range modules.InputChannels {
+		module := modules.InputModules[i]
+		select {
+		case c <- 1:
+		default:
+			log.Printf("The %s input module is queuing requests", module.Name())
+		}
+	}
+
+	// collect all metrics that are available
+	collectMetrics := true
+	for collectMetrics {
+		select {
+		case metrics := <-modules.InputResponseChan:
+			allMetrics = append(allMetrics, metrics...)
+		default:
+			collectMetrics = false
 		}
 	}
 

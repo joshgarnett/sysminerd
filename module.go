@@ -1,15 +1,18 @@
 package main
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 )
 
 type Modules struct {
-	InputModules     []Module
-	TransformModules []Module
-	OutputModules    []Module
+	InputModules      []Module
+	TransformModules  []Module
+	OutputModules     []Module
+	InputResponseChan chan []Metric
+	InputChannels     []chan int
 }
 
 type Module interface {
@@ -38,6 +41,8 @@ func getModules(config Config) Modules {
 
 	modules := Modules{}
 
+	modules.InputResponseChan = make(chan []Metric, len(files)*2)
+
 	for _, file := range files {
 		if file.IsDir() {
 			log.Printf("Found subdirectory %s in config path %s", file.Name(), config.ConfigPath)
@@ -64,6 +69,11 @@ func getModules(config Config) Modules {
 				log.Fatalf("unexpected type %T", v)
 			case InputModule:
 				modules.InputModules = append(modules.InputModules, module)
+				requestChan, err := InitInputModule(module, modules.InputResponseChan)
+				if err != nil {
+					log.Fatalf("Failed to initialize input module: %v", err)
+				}
+				modules.InputChannels = append(modules.InputChannels, requestChan)
 			case TransformModule:
 				modules.TransformModules = append(modules.TransformModules, module)
 			case OutputModule:
@@ -75,6 +85,30 @@ func getModules(config Config) Modules {
 	}
 
 	return modules
+}
+
+// InitInputModule creates a channel for making requests on and aggregates the response on the
+// responseChan that is passed in.  It returns the request channel.
+func InitInputModule(module Module, responseChan chan []Metric) (chan int, error) {
+	inputModule, ok := module.(InputModule)
+	if !ok {
+		return nil, errors.New("Not an input module")
+	}
+	requestChan := make(chan int)
+
+	// Create a goroutine to listen for requests on the request channel
+	go func(module InputModule, requestChan chan int, responseChan chan []Metric) {
+		for _ = range requestChan {
+			metrics, err := module.GetMetrics()
+			if err != nil {
+				log.Print("Failed to retrieve metrics")
+			} else {
+				responseChan <- metrics
+			}
+		}
+	}(inputModule, requestChan, responseChan)
+
+	return requestChan, nil
 }
 
 func getModule(name string) Module {
