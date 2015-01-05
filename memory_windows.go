@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall"
 	"time"
 	"unsafe"
@@ -45,6 +44,7 @@ func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
 		return nil, err
 	}
 
+	metrics = append(metrics, Metric{module: m.Name(), name: "CurrentLoad", value: float64(memData.dwMemoryLoad), timestamp: now})
 	metrics = append(metrics, Metric{module: m.Name(), name: "Total", value: float64(memData.ullTotalPhys), timestamp: now})
 	metrics = append(metrics, Metric{module: m.Name(), name: "Free", value: float64(memData.ullAvailPhys), timestamp: now})
 
