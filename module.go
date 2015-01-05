@@ -121,6 +121,8 @@ func getModule(name string) Module {
 		return &NetworkInputModule{}
 	case GraphiteModuleName:
 		return &GraphiteOutputModule{}
+	case DiskspaceModuleName:
+		return &DiskspaceInputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 
@@ -17,7 +18,7 @@ type Config struct {
 type ModuleConfig struct {
 	Name     string
 	Enabled  bool
-	Settings map[string]string
+	Settings map[string]interface{}
 }
 
 func parseConfig(path string) Config {
@@ -49,4 +50,53 @@ func parseModuleConfig(path string) ModuleConfig {
 	}
 
 	return moduleConfig
+}
+
+func (config *ModuleConfig) SettingsString(key string) (string, error) {
+	value, ok := config.Settings[key]
+	if !ok {
+		return "", errors.New("Key does not exist")
+	}
+	svalue, ok := value.(string)
+	if !ok {
+		return "", errors.New("value is not a string")
+	}
+	return svalue, nil
+}
+
+func (config *ModuleConfig) SettingsInt(key string) (int, error) {
+	value, ok := config.Settings[key]
+	if !ok {
+		return 0, errors.New("Key does not exist")
+	}
+	ivalue, ok := value.(int)
+	if !ok {
+		return 0, errors.New("value is not an int")
+	}
+	return ivalue, nil
+}
+
+func (config *ModuleConfig) SettingsArray(key string) ([]interface{}, error) {
+	value, ok := config.Settings[key]
+	if !ok {
+		return nil, errors.New("Key does not exist")
+	}
+	avalue, ok := value.([]interface{})
+	if !ok {
+		return nil, errors.New("value is not an array")
+	}
+	return avalue, nil
+}
+
+func (config *ModuleConfig) SettingsStringArray(key string) ([]string, error) {
+	avalue, err := config.SettingsArray(key)
+	if err != nil {
+		return nil, err
+	}
+	values := make([]string, 0, len(avalue))
+	for _, v := range avalue {
+		sv, _ := v.(string)
+		values = append(values, sv)
+	}
+	return values, nil
 }

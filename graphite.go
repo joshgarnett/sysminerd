@@ -5,7 +5,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -50,24 +49,24 @@ func (m *GraphiteOutputModule) Init(config *Config, moduleConfig *ModuleConfig) 
 	graphitePrefix := fmt.Sprintf("sysminerd.%s", hostname)
 
 	// parse graphite settings
-	graphiteHostname := moduleConfig.Settings["hostname"]
-	if graphiteHostname == "" {
-		log.Fatal("hostname must be specified")
+	graphiteHostname, err := moduleConfig.SettingsString("hostname")
+	if err != nil || graphiteHostname == "" {
+		log.Fatalf("hostname must be specified: %v", err)
 	}
 
-	graphitePort, err := strconv.ParseInt(moduleConfig.Settings["port"], 10, 64)
+	graphitePort, err := moduleConfig.SettingsInt("port")
 	if err != nil {
 		log.Fatalf("Unable to parse port: %v", err)
 	} else if graphitePort < 1 || graphitePort > 65535 {
 		log.Fatalf("invalid port number: %d", graphitePort)
 	}
 
-	protocol := moduleConfig.Settings["protocol"]
+	protocol, err := moduleConfig.SettingsString("protocol")
 	if protocol != "tcp" && protocol != "udp" {
 		log.Fatalf("Graphite protocol %s is not supported", protocol)
 	}
 
-	maxQueueSize, err := strconv.ParseInt(moduleConfig.Settings["max_queue_size"], 10, 64)
+	maxQueueSize, err := moduleConfig.SettingsInt("max_queue_size")
 	if err != nil {
 		maxQueueSize = 0
 	}
