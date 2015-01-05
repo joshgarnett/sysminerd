@@ -10,13 +10,6 @@ import (
 	"time"
 )
 
-type Metric struct {
-	module    string
-	name      string
-	value     float64
-	timestamp time.Time
-}
-
 var configFile = flag.String("c", "", "config file to use")
 
 func usage() {
