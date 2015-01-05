@@ -3,32 +3,8 @@
 package main
 
 import (
-	"syscall"
 	"time"
 	"unsafe"
-)
-
-type (
-	dword     uint32
-	dwordLong uint64
-
-	memorystatusex struct {
-		dwLength                dword
-		dwMemoryLoad            dword
-		ullTotalPhys            dwordLong
-		ullAvailPhys            dwordLong
-		ullTotalPageFile        dwordLong
-		ullAvailPageFile        dwordLong
-		ullTotalVirtual         dwordLong
-		ullAvailVirtual         dwordLong
-		ullAvailExtendedVirtual dwordLong
-	}
-)
-
-var kernel32 = syscall.NewLazyDLL("kernel32.dll")
-
-var (
-	globalMemoryStatusEx = kernel32.NewProc("GlobalMemoryStatusEx")
 )
 
 func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
@@ -38,7 +14,7 @@ func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
 	var memData memorystatusex
 	memData.dwLength = dword(unsafe.Sizeof(memData))
 
-	r1, _, err := globalMemoryStatusEx.Call(uintptr(unsafe.Pointer(&memData)))
+	r1, _, err := _globalMemoryStatusEx.Call(uintptr(unsafe.Pointer(&memData)))
 
 	if r1 != 1 {
 		return nil, err
