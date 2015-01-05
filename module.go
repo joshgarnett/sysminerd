@@ -129,6 +129,12 @@ func getModule(name string) Module {
 }
 
 func tearDownModules(modules *Modules) {
+	//close all channels
+	for _, c := range modules.InputChannels {
+		close(c)
+	}
+	close(modules.InputResponseChan)
+
 	// input modules
 	for _, e := range modules.InputModules {
 		e.TearDown()
