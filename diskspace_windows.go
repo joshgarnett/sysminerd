@@ -59,8 +59,6 @@ func (m *DiskspaceInputModule) GetMetrics() ([]Metric, error) {
 
 func (m *DiskspaceInputModule) GetLogicalDrives() []string {
 
-	_getLogicalDrives := kernel32.NewProc("GetLogicalDrives")
-
 	n, _, _ := _getLogicalDrives.Call()
 	s := strconv.FormatInt(int64(n), 2)
 
