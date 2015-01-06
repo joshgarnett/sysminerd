@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
@@ -41,14 +40,9 @@ func (m *CPUInputModule) TearDown() error {
 	return nil
 }
 
-func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
+func (m *CPUInputModule) ParseProcStat(content string) ([]Metric, error) {
 	metrics := make([]Metric, 0, 10)
 
-	b, err := ioutil.ReadFile("/proc/stat")
-	if err != nil {
-		return nil, err
-	}
-	content := string(b)
 	lines := strings.Split(content, "\n")
 
 	cpus := make(map[string][]float64)
