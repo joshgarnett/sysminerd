@@ -37,16 +37,18 @@ func (m *NetworkInputModule) GetMetrics() ([]Metric, error) {
 
 	if m.previousIfaces != nil {
 		for iface, fields := range ifaces {
-			previous := m.previousIfaces[iface]
+			previous, ok := m.previousIfaces[iface]
 
-			for name, value := range fields {
-				metric := Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.%s", iface, name),
-					value:     value - previous[name],
-					timestamp: now,
+			if ok {
+				for name, value := range fields {
+					metric := Metric{
+						module:    m.Name(),
+						name:      fmt.Sprintf("%s.%s", iface, name),
+						value:     value - previous[name],
+						timestamp: now,
+					}
+					metrics = append(metrics, metric)
 				}
-				metrics = append(metrics, metric)
 			}
 		}
 	}

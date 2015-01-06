@@ -123,6 +123,8 @@ func getModule(name string) Module {
 		return &GraphiteOutputModule{}
 	case DiskspaceModuleName:
 		return &DiskspaceInputModule{}
+	case DiskusageModuleName:
+		return &DiskusageInputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}
