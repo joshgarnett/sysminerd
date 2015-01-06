@@ -57,13 +57,9 @@ func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
 		content += fmt.Sprintf("cpu%d %d %d %d %d %d %d %d %d \n", i, userTime, 0, SysTime, idleTime, 0, intTime, 0, 0)
 	}
 
-	//spi := new(SYSTEM_PERFORMANCE_INFORMATION)
-
 	spi := SYSTEM_PERFORMANCE_INFORMATION{}
 
 	sizeof_spi := unsafe.Sizeof(spi)
-
-	fmt.Printf("SIZE %d \n", uintptr(sizeof_spi))
 
 	r1, _, err = _ntQuerySystemInformation.Call(SystemPerformanceInformation, uintptr(unsafe.Pointer(&spi)), uintptr(sizeof_spi), uintptr(0))
 	if !(r1 >= 0) {
