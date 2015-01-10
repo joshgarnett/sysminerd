@@ -6,48 +6,46 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
-	"time"
 )
 
-func (m *MemoryInputModule) GetMetrics() ([]Metric, error) {
+func (m *MemoryInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 50)
-	now := time.Now()
 
 	meminfo, err := ParseMeminfo("/proc/meminfo")
 	if err != nil {
 		return nil, err
 	}
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "Total", value: meminfo["MemTotal"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Free", value: meminfo["MemFree"], timestamp: now})
+	metrics = append(metrics, NewMetric("Total", meminfo["MemTotal"]))
+	metrics = append(metrics, NewMetric("Free", meminfo["MemFree"]))
 
 	used := meminfo["MemTotal"] - (meminfo["MemFree"])
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "Used", value: used, timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Cached", value: meminfo["Cached"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "Buffer", value: meminfo["Buffers"], timestamp: now})
+	metrics = append(metrics, NewMetric("Used", used))
+	metrics = append(metrics, NewMetric("Cached", meminfo["Cached"]))
+	metrics = append(metrics, NewMetric("Buffer", meminfo["Buffers"]))
 
 	bcTotal := meminfo["Cached"] + meminfo["Buffers"]
 	bcUsed := used - bcTotal
 	bcFree := meminfo["MemFree"] + bcTotal
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "BufferCacheTotal", value: bcTotal, timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "BufferCacheUser", value: bcUsed, timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "BufferCacheFree", value: bcFree, timestamp: now})
+	metrics = append(metrics, NewMetric("BufferCacheTotal", bcTotal))
+	metrics = append(metrics, NewMetric("BufferCacheUser", bcUsed))
+	metrics = append(metrics, NewMetric("BufferCacheFree", bcFree))
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "SwapTotal", value: meminfo["SwapTotal"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "SwapFree", value: meminfo["SwapFree"], timestamp: now})
+	metrics = append(metrics, NewMetric("SwapTotal", meminfo["SwapTotal"]))
+	metrics = append(metrics, NewMetric("SwapFree", meminfo["SwapFree"]))
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "HighTotal", value: meminfo["HighTotal"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "HighFree", value: meminfo["HighFree"], timestamp: now})
+	metrics = append(metrics, NewMetric("HighTotal", meminfo["HighTotal"]))
+	metrics = append(metrics, NewMetric("HighFree", meminfo["HighFree"]))
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "LowTotal", value: meminfo["LowTotal"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "LowFree", value: meminfo["LowFree"], timestamp: now})
+	metrics = append(metrics, NewMetric("LowTotal", meminfo["LowTotal"]))
+	metrics = append(metrics, NewMetric("LowFree", meminfo["LowFree"]))
 
-	metrics = append(metrics, Metric{module: m.Name(), name: "SlabReclaimable", value: meminfo["SReclaimable"], timestamp: now})
-	metrics = append(metrics, Metric{module: m.Name(), name: "SlabUnreclaimable", value: meminfo["SUnreclaim"], timestamp: now})
+	metrics = append(metrics, NewMetric("SlabReclaimable", meminfo["SReclaimable"]))
+	metrics = append(metrics, NewMetric("SlabUnreclaimable", meminfo["SUnreclaim"]))
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }
 
 func ParseMeminfo(path string) (map[string]float64, error) {

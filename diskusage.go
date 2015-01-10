@@ -41,7 +41,7 @@ func (m *DiskusageInputModule) TearDown() error {
 	return nil
 }
 
-func (m *DiskusageInputModule) GetMetrics() ([]Metric, error) {
+func (m *DiskusageInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 50)
 	now := time.Now()
 	timeDiff := time.Since(m.previousTime).Seconds()
@@ -63,42 +63,12 @@ func (m *DiskusageInputModule) GetMetrics() ([]Metric, error) {
 				readBytesPerSecond := ((stats.ReadsSectors - previous.ReadsSectors) * 512) / timeDiff
 				writeBytesPerSecond := ((stats.WritesSectors - previous.WritesSectors) * 512) / timeDiff
 
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.Reads", device),
-					value:     readsPerSecond,
-					timestamp: now,
-				})
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.Writes", device),
-					value:     writesPerSecond,
-					timestamp: now,
-				})
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.ReadsMerged", device),
-					value:     readsMergedPerSecond,
-					timestamp: now,
-				})
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.WritesMerged", device),
-					value:     writesMergedPerSecond,
-					timestamp: now,
-				})
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.ReadBytes", device),
-					value:     readBytesPerSecond,
-					timestamp: now,
-				})
-				metrics = append(metrics, Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.WriteBytes", device),
-					value:     writeBytesPerSecond,
-					timestamp: now,
-				})
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.Reads", device), readsPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.Writes", device), writesPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.ReadsMerged", device), readsMergedPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.WritesMerged", device), writesMergedPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.ReadBytes", device), readBytesPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.WriteBytes", device), writeBytesPerSecond))
 			}
 		}
 	}
@@ -106,7 +76,7 @@ func (m *DiskusageInputModule) GetMetrics() ([]Metric, error) {
 	m.previousDiskStats = allStats
 	m.previousTime = now
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }
 
 func GetDiskStats(path string) (map[string]DiskStats, error) {

@@ -18,7 +18,7 @@ type GraphiteOutputModule struct {
 	Protocol      string
 	MaxQueueSize  int
 	conn          net.Conn
-	queuedMetrics []Metric
+	queuedMetrics []string
 }
 
 func (m *GraphiteOutputModule) Name() string {
@@ -91,13 +91,25 @@ func (m *GraphiteOutputModule) TearDown() error {
 	return nil
 }
 
-func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) error {
+func (m *GraphiteOutputModule) SendMetrics(moduleMetrics []*ModuleMetrics) error {
 	var err error
+
+	metrics := make([]string, 0, len(moduleMetrics)*5)
+
+	// convert metrics to graphite metrics
+	for _, module := range moduleMetrics {
+		moduleName := module.Module
+		for _, metric := range module.Metrics {
+			metricName := fmt.Sprintf("%s.%s.%s", m.Prefix, moduleName, metric.Name)
+			graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.Value, metric.Timestamp.Unix())
+			metrics = append(metrics, graphiteMetric)
+		}
+	}
 
 	// add queued metrics also
 	if len(m.queuedMetrics) > 0 {
 		metrics = append(m.queuedMetrics, metrics...)
-		m.queuedMetrics = make([]Metric, 0, len(metrics))
+		m.queuedMetrics = make([]string, 0, len(metrics))
 	}
 
 	// attempt to reconnect to graphite
@@ -116,13 +128,10 @@ func (m *GraphiteOutputModule) SendMetrics(metrics []Metric) error {
 			continue
 		}
 
-		metricName := fmt.Sprintf("%s.%s.%s", m.Prefix, metric.module, metric.name)
+		log.Printf("Graphite: %s", metric)
 
-		graphiteMetric := fmt.Sprintf("%s %f %d\n", metricName, metric.value, metric.timestamp.Unix())
-		log.Printf("Graphite: %s", graphiteMetric)
-
-		n, err := m.conn.Write([]byte(graphiteMetric))
-		if err != nil || n != len(graphiteMetric) {
+		n, err := m.conn.Write([]byte(metric))
+		if err != nil || n != len(metric) {
 			log.Printf("Error sending graphite metric: %v", err)
 			m.queuedMetrics = append(m.queuedMetrics, metric)
 

@@ -9,12 +9,10 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-func (m *DiskspaceInputModule) GetMetrics() ([]Metric, error) {
+func (m *DiskspaceInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 50)
-	now := time.Now()
 
 	filesystems, err := GetFileSystems(m)
 	if err != nil {
@@ -28,37 +26,18 @@ func (m *DiskspaceInputModule) GetMetrics() ([]Metric, error) {
 	}
 
 	for _, stat := range stats {
-		used := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.used", stat.DeviceName),
-			value:     stat.Used,
-			timestamp: now,
-		}
-		free := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.free", stat.DeviceName),
-			value:     stat.Free,
-			timestamp: now,
-		}
-		reserved := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.reserved", stat.DeviceName),
-			value:     stat.Reserved,
-			timestamp: now,
-		}
-		available := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.available", stat.DeviceName),
-			value:     stat.Available,
-			timestamp: now,
-		}
+		used := NewMetric(fmt.Sprintf("%s.used", stat.DeviceName), stat.Used)
+		free := NewMetric(fmt.Sprintf("%s.free", stat.DeviceName), stat.Free)
+		reserved := NewMetric(fmt.Sprintf("%s.reserved", stat.DeviceName), stat.Reserved)
+		available := NewMetric(fmt.Sprintf("%s.available", stat.DeviceName), stat.Available)
+
 		metrics = append(metrics, used)
 		metrics = append(metrics, free)
 		metrics = append(metrics, reserved)
 		metrics = append(metrics, available)
 	}
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }
 
 func GetFileSystems(m *DiskspaceInputModule) ([]Filesystem, error) {

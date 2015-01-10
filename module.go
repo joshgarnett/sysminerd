@@ -11,7 +11,7 @@ type Modules struct {
 	InputModules      []Module
 	TransformModules  []Module
 	OutputModules     []Module
-	InputResponseChan chan []Metric
+	InputResponseChan chan *ModuleMetrics
 	InputChannels     []chan int
 }
 
@@ -26,11 +26,11 @@ type TransformModule interface {
 }
 
 type InputModule interface {
-	GetMetrics() ([]Metric, error)
+	GetMetrics() (*ModuleMetrics, error)
 }
 
 type OutputModule interface {
-	SendMetrics(metrics []Metric) error
+	SendMetrics([]*ModuleMetrics) error
 }
 
 func getModules(config Config) Modules {
@@ -41,7 +41,7 @@ func getModules(config Config) Modules {
 
 	modules := Modules{}
 
-	modules.InputResponseChan = make(chan []Metric, len(files)*2)
+	modules.InputResponseChan = make(chan *ModuleMetrics, len(files)*2)
 
 	for _, file := range files {
 		if file.IsDir() {
@@ -89,7 +89,7 @@ func getModules(config Config) Modules {
 
 // InitInputModule creates a channel for making requests on and aggregates the response on the
 // responseChan that is passed in.  It returns the request channel.
-func InitInputModule(module Module, responseChan chan []Metric) (chan int, error) {
+func InitInputModule(module Module, responseChan chan *ModuleMetrics) (chan int, error) {
 	inputModule, ok := module.(InputModule)
 	if !ok {
 		return nil, errors.New("Not an input module")
@@ -97,7 +97,7 @@ func InitInputModule(module Module, responseChan chan []Metric) (chan int, error
 	requestChan := make(chan int)
 
 	// Create a goroutine to listen for requests on the request channel
-	go func(module InputModule, requestChan chan int, responseChan chan []Metric) {
+	go func(module InputModule, requestChan chan int, responseChan chan *ModuleMetrics) {
 		for _ = range requestChan {
 			metrics, err := module.GetMetrics()
 			if err != nil {

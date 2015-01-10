@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
+func (m *CPUInputModule) GetMetrics() (*ModuleMetrics, error) {
 
 	cpuNum := runtime.NumCPU()
 
