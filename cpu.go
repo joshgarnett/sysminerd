@@ -5,7 +5,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const CpuModuleName = "cpu"
@@ -40,7 +39,7 @@ func (m *CPUInputModule) TearDown() error {
 	return nil
 }
 
-func (m *CPUInputModule) ParseProcStat(content string) ([]Metric, error) {
+func (m *CPUInputModule) ParseProcStat(content string) (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 10)
 
 	lines := strings.Split(content, "\n")
@@ -72,20 +71,14 @@ func (m *CPUInputModule) ParseProcStat(content string) ([]Metric, error) {
 		}
 	}
 
-	now := time.Now()
-
 	if m.previousCPUStats != nil {
 		for cpu, values := range cpus {
 			totalDiff := values[0] - m.previousCPUStats[cpu][0]
 			for name, index := range cpuFields {
 				value := values[index] - m.previousCPUStats[cpu][index]
 
-				metric := Metric{
-					module:    m.Name(),
-					name:      fmt.Sprintf("%s.%s", cpu, name),
-					value:     (value / totalDiff) * 100,
-					timestamp: now,
-				}
+				metric := NewMetric(fmt.Sprintf("%s.%s", cpu, name), (value/totalDiff)*100)
+
 				metrics = append(metrics, metric)
 			}
 		}
@@ -93,5 +86,5 @@ func (m *CPUInputModule) ParseProcStat(content string) ([]Metric, error) {
 
 	m.previousCPUStats = cpus
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }

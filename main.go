@@ -68,7 +68,7 @@ func main() {
 func tickModules(config Config, modules *Modules) {
 	var start = time.Now()
 
-	allMetrics := []Metric{}
+	allMetrics := []*ModuleMetrics{}
 
 	// send metric requests to the input modules in a non blocking manner
 	for i, c := range modules.InputChannels {
@@ -85,7 +85,7 @@ func tickModules(config Config, modules *Modules) {
 	for collectMetrics {
 		select {
 		case metrics := <-modules.InputResponseChan:
-			allMetrics = append(allMetrics, metrics...)
+			allMetrics = append(allMetrics, metrics)
 		default:
 			collectMetrics = false
 		}

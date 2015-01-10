@@ -4,10 +4,9 @@ package main
 
 import (
 	"io/ioutil"
-	"strings"
 )
 
-func (m *CPUInputModule) GetMetrics() ([]Metric, error) {
+func (m *CPUInputModule) GetMetrics() (*ModuleMetrics, error) {
 
 	b, err := ioutil.ReadFile("/proc/stat")
 	if err != nil {

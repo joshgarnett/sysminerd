@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"strconv"
 	"syscall"
-	"time"
 	"unsafe"
 )
 
-func (m *DiskspaceInputModule) GetMetrics() ([]Metric, error) {
-
+func (m *DiskspaceInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 50)
-	now := time.Now()
 
 	// we grab all the drives
 	drives := m.GetLogicalDrives()
@@ -31,30 +28,16 @@ func (m *DiskspaceInputModule) GetMetrics() ([]Metric, error) {
 
 		usedBytes := lpTotalNumberOfBytes - lpTotalNumberOfFreeBytes
 
-		used := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.used", drive[:1]),
-			value:     float64(usedBytes),
-			timestamp: now,
-		}
-		free := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.free", drive[:1]),
-			value:     float64(lpTotalNumberOfFreeBytes),
-			timestamp: now,
-		}
-		available := Metric{
-			module:    m.Name(),
-			name:      fmt.Sprintf("%s.available", drive[:1]),
-			value:     float64(lpFreeBytesAvailable),
-			timestamp: now,
-		}
+		used := NewMetric(fmt.Sprintf("%s.used", drive[:1]), float64(usedBytes))
+		free := NewMetric(fmt.Sprintf("%s.free", drive[:1]), float64(lpTotalNumberOfFreeBytes))
+		available := NewMetric(fmt.Sprintf("%s.available", drive[:1]), float64(lpFreeBytesAvailable))
+
 		metrics = append(metrics, used)
 		metrics = append(metrics, free)
 		metrics = append(metrics, available)
 	}
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }
 
 func (m *DiskspaceInputModule) GetLogicalDrives() []string {

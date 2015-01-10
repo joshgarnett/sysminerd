@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const NetworkModuleName = "network"
@@ -26,9 +25,8 @@ func (m *NetworkInputModule) TearDown() error {
 	return nil
 }
 
-func (m *NetworkInputModule) GetMetrics() ([]Metric, error) {
+func (m *NetworkInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 48)
-	now := time.Now()
 
 	ifaces, err := ParseNetworkDev("/proc/net/dev")
 	if err != nil {
@@ -41,12 +39,7 @@ func (m *NetworkInputModule) GetMetrics() ([]Metric, error) {
 
 			if ok {
 				for name, value := range fields {
-					metric := Metric{
-						module:    m.Name(),
-						name:      fmt.Sprintf("%s.%s", iface, name),
-						value:     value - previous[name],
-						timestamp: now,
-					}
+					metric := NewMetric(fmt.Sprintf("%s.%s", iface, name), value-previous[name])
 					metrics = append(metrics, metric)
 				}
 			}
@@ -55,7 +48,7 @@ func (m *NetworkInputModule) GetMetrics() ([]Metric, error) {
 
 	m.previousIfaces = ifaces
 
-	return metrics, nil
+	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }
 
 func ParseNetworkDev(path string) (map[string]map[string]float64, error) {
