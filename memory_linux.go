@@ -19,18 +19,16 @@ func (m *MemoryInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics = append(metrics, NewMetric("Total", meminfo["MemTotal"]))
 	metrics = append(metrics, NewMetric("Free", meminfo["MemFree"]))
 
-	used := meminfo["MemTotal"] - (meminfo["MemFree"])
+	used := meminfo["MemTotal"] - (meminfo["MemFree"] + meminfo["Buffers"] + meminfo["Cached"])
 
 	metrics = append(metrics, NewMetric("Used", used))
 	metrics = append(metrics, NewMetric("Cached", meminfo["Cached"]))
 	metrics = append(metrics, NewMetric("Buffer", meminfo["Buffers"]))
 
 	bcTotal := meminfo["Cached"] + meminfo["Buffers"]
-	bcUsed := used - bcTotal
 	bcFree := meminfo["MemFree"] + bcTotal
 
 	metrics = append(metrics, NewMetric("BufferCacheTotal", bcTotal))
-	metrics = append(metrics, NewMetric("BufferCacheUser", bcUsed))
 	metrics = append(metrics, NewMetric("BufferCacheFree", bcFree))
 
 	metrics = append(metrics, NewMetric("SwapTotal", meminfo["SwapTotal"]))

@@ -242,12 +242,21 @@
           "nullPointMode": "null",
           "steppedLine": false,
           "tooltip": {
-            "value_type": "individual",
+            "value_type": "cumulative",
             "shared": true
           },
           "targets": [
             {
-              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.*, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Buffer, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Cached, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Free, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Used, 3)"
             }
           ],
           "aliasColors": {},
@@ -260,7 +269,7 @@
           "span": 6,
           "editable": true,
           "type": "graph",
-          "id": 4,
+          "id": 11,
           "datasource": null,
           "renderer": "flot",
           "x-axis": true,
@@ -299,12 +308,21 @@
           "nullPointMode": "null",
           "steppedLine": false,
           "tooltip": {
-            "value_type": "individual",
+            "value_type": "cumulative",
             "shared": true
           },
           "targets": [
             {
-              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.*, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Buffer, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Cached, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Free, 3)"
+            },
+            {
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Used, 3)"
             }
           ],
           "aliasColors": {},
