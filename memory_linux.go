@@ -16,32 +16,32 @@ func (m *MemoryInputModule) GetMetrics() (*ModuleMetrics, error) {
 		return nil, err
 	}
 
-	metrics = append(metrics, NewMetric("Total", meminfo["MemTotal"]))
-	metrics = append(metrics, NewMetric("Free", meminfo["MemFree"]))
+	metrics = append(metrics, NewMetric("total", meminfo["MemTotal"]))
+	metrics = append(metrics, NewMetric("free", meminfo["MemFree"]))
 
 	used := meminfo["MemTotal"] - (meminfo["MemFree"] + meminfo["Buffers"] + meminfo["Cached"])
 
-	metrics = append(metrics, NewMetric("Used", used))
-	metrics = append(metrics, NewMetric("Cached", meminfo["Cached"]))
-	metrics = append(metrics, NewMetric("Buffer", meminfo["Buffers"]))
+	metrics = append(metrics, NewMetric("used", used))
+	metrics = append(metrics, NewMetric("cached", meminfo["Cached"]))
+	metrics = append(metrics, NewMetric("buffer", meminfo["Buffers"]))
 
 	bcTotal := meminfo["Cached"] + meminfo["Buffers"]
 	bcFree := meminfo["MemFree"] + bcTotal
 
-	metrics = append(metrics, NewMetric("BufferCacheTotal", bcTotal))
-	metrics = append(metrics, NewMetric("BufferCacheFree", bcFree))
+	metrics = append(metrics, NewMetric("buffer_cache_total", bcTotal))
+	metrics = append(metrics, NewMetric("buffer_cache_free", bcFree))
 
-	metrics = append(metrics, NewMetric("SwapTotal", meminfo["SwapTotal"]))
-	metrics = append(metrics, NewMetric("SwapFree", meminfo["SwapFree"]))
+	metrics = append(metrics, NewMetric("swap_total", meminfo["SwapTotal"]))
+	metrics = append(metrics, NewMetric("swap_free", meminfo["SwapFree"]))
 
-	metrics = append(metrics, NewMetric("HighTotal", meminfo["HighTotal"]))
-	metrics = append(metrics, NewMetric("HighFree", meminfo["HighFree"]))
+	metrics = append(metrics, NewMetric("high_total", meminfo["HighTotal"]))
+	metrics = append(metrics, NewMetric("high_free", meminfo["HighFree"]))
 
-	metrics = append(metrics, NewMetric("LowTotal", meminfo["LowTotal"]))
-	metrics = append(metrics, NewMetric("LowFree", meminfo["LowFree"]))
+	metrics = append(metrics, NewMetric("low_total", meminfo["LowTotal"]))
+	metrics = append(metrics, NewMetric("low_free", meminfo["LowFree"]))
 
-	metrics = append(metrics, NewMetric("SlabReclaimable", meminfo["SReclaimable"]))
-	metrics = append(metrics, NewMetric("SlabUnreclaimable", meminfo["SUnreclaim"]))
+	metrics = append(metrics, NewMetric("slab_reclaimable", meminfo["SReclaimable"]))
+	metrics = append(metrics, NewMetric("slab_unreclaimable", meminfo["SUnreclaim"]))
 
 	return &ModuleMetrics{Module: m.Name(), Metrics: metrics}, nil
 }

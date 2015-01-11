@@ -36,18 +36,18 @@ func (m *InternalInputModule) GetMetrics() (*ModuleMetrics, error) {
 		mallocs := memstats.Mallocs - previous.Mallocs
 		frees := memstats.Frees - previous.Frees
 
-		metrics = append(metrics, NewMetric("general.Alloc", float64(memstats.Alloc)))
-		metrics = append(metrics, NewMetric("general.Sys", float64(memstats.Sys)))
-		metrics = append(metrics, NewMetric("general.Lookups", float64(lookups)))
-		metrics = append(metrics, NewMetric("general.Mallocs", float64(mallocs)))
-		metrics = append(metrics, NewMetric("general.Frees", float64(frees)))
+		metrics = append(metrics, NewMetric("general.allocated", float64(memstats.Alloc)))
+		metrics = append(metrics, NewMetric("general.system", float64(memstats.Sys)))
+		metrics = append(metrics, NewMetric("general.lookups", float64(lookups)))
+		metrics = append(metrics, NewMetric("general.mallocs", float64(mallocs)))
+		metrics = append(metrics, NewMetric("general.frees", float64(frees)))
 
-		metrics = append(metrics, NewMetric("heap.Alloc", float64(memstats.HeapAlloc)))
-		metrics = append(metrics, NewMetric("heap.Sys", float64(memstats.HeapSys)))
-		metrics = append(metrics, NewMetric("heap.Idle", float64(memstats.HeapIdle)))
-		metrics = append(metrics, NewMetric("heap.Inuse", float64(memstats.HeapInuse)))
-		metrics = append(metrics, NewMetric("heap.Released", float64(memstats.HeapReleased)))
-		metrics = append(metrics, NewMetric("heap.Objects", float64(memstats.HeapObjects)))
+		metrics = append(metrics, NewMetric("heap.allocated", float64(memstats.HeapAlloc)))
+		metrics = append(metrics, NewMetric("heap.system", float64(memstats.HeapSys)))
+		metrics = append(metrics, NewMetric("heap.idle", float64(memstats.HeapIdle)))
+		metrics = append(metrics, NewMetric("heap.in_use", float64(memstats.HeapInuse)))
+		metrics = append(metrics, NewMetric("heap.released", float64(memstats.HeapReleased)))
+		metrics = append(metrics, NewMetric("heap.objects", float64(memstats.HeapObjects)))
 
 		numGC := int(memstats.NumGC - previous.NumGC)
 		var averageGC float64
@@ -59,9 +59,8 @@ func (m *InternalInputModule) GetMetrics() (*ModuleMetrics, error) {
 			averageGC = float64(total) / float64(numGC) / 1000000
 		}
 
-		metrics = append(metrics, NewMetric("gc.PauseTotalNs", float64(memstats.PauseTotalNs)))
-		metrics = append(metrics, NewMetric("gc.AverageGCMs", averageGC))
-		metrics = append(metrics, NewMetric("gc.NumGC", float64(numGC)))
+		metrics = append(metrics, NewMetric("gc.average_gc", averageGC))
+		metrics = append(metrics, NewMetric("gc.num_gc", float64(numGC)))
 	}
 
 	m.lastStats = &memstats

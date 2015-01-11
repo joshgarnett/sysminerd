@@ -98,25 +98,25 @@ func GetProcessStats(pid int64) (*Process, error) {
 	// convert state to full string name
 	switch strings.ToUpper(process.State) {
 	case "R":
-		process.State = "Running"
+		process.State = "running"
 	case "S":
-		process.State = "Sleeping"
+		process.State = "sleeping"
 	case "D":
-		process.State = "Blocked"
+		process.State = "blocked"
 	case "Z":
-		process.State = "Zombies"
+		process.State = "zombies"
 	case "T":
-		process.State = "Stopped"
+		process.State = "stopped"
 	case "W":
-		process.State = "Paging"
+		process.State = "paging"
 	case "X":
-		process.State = "Dead"
+		process.State = "dead"
 	case "K":
-		process.State = "Wakekill"
+		process.State = "wake_kill"
 	case "P":
-		process.State = "Parked"
+		process.State = "parked"
 	default:
-		process.State = "Unknown"
+		process.State = "unknown"
 	}
 
 	return &process, nil

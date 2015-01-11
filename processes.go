@@ -25,12 +25,12 @@ func (m *ProcessesInputModule) GetMetrics() (*ModuleMetrics, error) {
 	metrics := make([]Metric, 0, 48)
 
 	states := map[string]int{
-		"Running":  0,
-		"Sleeping": 0,
-		"Blocked":  0,
-		"Zombies":  0,
-		"Stopped":  0,
-		"Paging":   0,
+		"running":  0,
+		"sleeping": 0,
+		"blocked":  0,
+		"zombies":  0,
+		"stopped":  0,
+		"paging":   0,
 	}
 
 	files, err := ioutil.ReadDir("/proc")

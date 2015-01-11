@@ -11,16 +11,16 @@ const CpuModuleName = "cpu"
 
 // CPU Fields for /proc/stat
 var cpuFields = map[string]int{
-	"User":      1,
-	"Nice":      2,
-	"System":    3,
-	"Idle":      4,
-	"IOWait":    5,
-	"IRQ":       6,
-	"SoftIRQ":   7,
-	"Steal":     8,
-	"Guest":     9,
-	"GuestNice": 10,
+	"user":       1,
+	"nice":       2,
+	"system":     3,
+	"idle":       4,
+	"io_wait":    5,
+	"irq":        6,
+	"soft_irq":   7,
+	"steal":      8,
+	"guest":      9,
+	"guest_nice": 10,
 }
 
 type CPUInputModule struct {

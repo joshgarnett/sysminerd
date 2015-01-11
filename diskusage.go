@@ -63,12 +63,12 @@ func (m *DiskusageInputModule) GetMetrics() (*ModuleMetrics, error) {
 				readBytesPerSecond := ((stats.ReadsSectors - previous.ReadsSectors) * 512) / timeDiff
 				writeBytesPerSecond := ((stats.WritesSectors - previous.WritesSectors) * 512) / timeDiff
 
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.Reads", device), readsPerSecond))
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.Writes", device), writesPerSecond))
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.ReadsMerged", device), readsMergedPerSecond))
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.WritesMerged", device), writesMergedPerSecond))
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.ReadBytes", device), readBytesPerSecond))
-				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.WriteBytes", device), writeBytesPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.reads", device), readsPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.writes", device), writesPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.reads_merged", device), readsMergedPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.writes_merged", device), writesMergedPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.read_bytes", device), readBytesPerSecond))
+				metrics = append(metrics, NewMetric(fmt.Sprintf("%s.write_bytes", device), writeBytesPerSecond))
 			}
 		}
 	}

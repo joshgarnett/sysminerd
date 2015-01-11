@@ -33,7 +33,7 @@
           "grid": {
             "leftMax": null,
             "rightMax": null,
-            "leftMin": null,
+            "leftMin": 0,
             "rightMin": null,
             "threshold1": null,
             "threshold2": null,
@@ -65,34 +65,28 @@
           },
           "targets": [
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.Guest), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.idle), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.GuestNice), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.io_wait), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.IOWait), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.irq), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.IRQ), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.nice), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.Idle), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.soft_irq), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.Nice), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.steal), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.SoftIRQ), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.system), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.Steal), 4)"
-            },
-            {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.System), 4)"
-            },
-            {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.User), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-centos_local.cpu.*.user), 4)"
             }
           ],
           "aliasColors": {
@@ -108,7 +102,7 @@
           "span": 6,
           "editable": true,
           "type": "graph",
-          "id": 2,
+          "id": 22,
           "datasource": null,
           "renderer": "flot",
           "x-axis": true,
@@ -120,7 +114,7 @@
           "grid": {
             "leftMax": null,
             "rightMax": null,
-            "leftMin": null,
+            "leftMin": 0,
             "rightMin": null,
             "threshold1": null,
             "threshold2": null,
@@ -152,34 +146,28 @@
           },
           "targets": [
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.Guest), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.idle), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.GuestNice), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.io_wait), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.IOWait), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.irq), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.IRQ), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.nice), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.Idle), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.soft_irq), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.Nice), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.steal), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.SoftIRQ), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.system), 4)"
             },
             {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.Steal), 4)"
-            },
-            {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.System), 4)"
-            },
-            {
-              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.User), 4)"
+              "target": "aliasByNode(sumSeries(sysminerd.sysminerd-ubuntu_local.cpu.*.user), 4)"
             }
           ],
           "aliasColors": {
@@ -247,16 +235,16 @@
           },
           "targets": [
             {
-              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Buffer, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.buffer, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Cached, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.cached, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Free, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.free, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.Used, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-centos_local.memory.used, 3)"
             }
           ],
           "aliasColors": {},
@@ -313,16 +301,16 @@
           },
           "targets": [
             {
-              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Buffer, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.buffer, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Cached, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.cached, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Free, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.free, 3)"
             },
             {
-              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.Used, 3)"
+              "target": "aliasByNode(sysminerd.sysminerd-ubuntu_local.memory.used, 3)"
             }
           ],
           "aliasColors": {},
@@ -463,7 +451,7 @@
       "title": "Diskspace",
       "height": "250px",
       "editable": true,
-      "collapse": true,
+      "collapse": false,
       "panels": [
         {
           "title": "centos / diskspace",
@@ -597,7 +585,7 @@
       "title": "Disk Usage",
       "height": "250px",
       "editable": true,
-      "collapse": true,
+      "collapse": false,
       "panels": [
         {
           "title": "centos diskusage",
@@ -649,10 +637,10 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.diskusage.sda.ReadBytes)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.diskusage.sda.read_bytes)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.diskusage.sda.WriteBytes)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.diskusage.sda.write_bytes)"
             }
           ],
           "aliasColors": {},
@@ -709,10 +697,10 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.diskusage.sda.ReadBytes)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.diskusage.sda.read_bytes)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.diskusage.sda.WriteBytes)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.diskusage.sda.write_bytes)"
             }
           ],
           "aliasColors": {},
@@ -1021,10 +1009,10 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.general.Alloc)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.general.allocated)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.general.Sys)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.general.system)"
             }
           ],
           "aliasColors": {},
@@ -1081,19 +1069,19 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.Alloc)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.allocated)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.Idle)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.idle)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.Inuse)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.in_use)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.Released)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.released)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.Sys)"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.heap.system)"
             }
           ],
           "aliasColors": {},
@@ -1150,7 +1138,7 @@
           },
           "targets": [
             {
-              "target": "alias(sysminerd.sysminerd-centos_local.internal.gc.AverageGCMs, 'Average GC ms')"
+              "target": "aliasByMetric(sysminerd.sysminerd-centos_local.internal.gc.average_gc)"
             }
           ],
           "aliasColors": {},
@@ -1215,10 +1203,10 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.general.Alloc)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.general.allocated)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.general.Sys)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.general.system)"
             }
           ],
           "aliasColors": {},
@@ -1275,19 +1263,19 @@
           },
           "targets": [
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.Alloc)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.allocated)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.Idle)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.idle)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.Inuse)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.in_use)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.Released)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.released)"
             },
             {
-              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.Sys)"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.heap.system)"
             }
           ],
           "aliasColors": {},
@@ -1344,7 +1332,7 @@
           },
           "targets": [
             {
-              "target": "alias(sysminerd.sysminerd-ubuntu_local.internal.gc.AverageGCMs, 'Average GC ms')"
+              "target": "aliasByMetric(sysminerd.sysminerd-ubuntu_local.internal.gc.average_gc)"
             }
           ],
           "aliasColors": {},
