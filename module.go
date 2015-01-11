@@ -127,6 +127,8 @@ func getModule(name string) Module {
 		return &DiskusageInputModule{}
 	case LoadModuleName:
 		return &LoadInputModule{}
+	case ProcessessModuleName:
+		return &ProcessesInputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}
