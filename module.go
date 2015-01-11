@@ -125,6 +125,8 @@ func getModule(name string) Module {
 		return &DiskspaceInputModule{}
 	case DiskusageModuleName:
 		return &DiskusageInputModule{}
+	case LoadModuleName:
+		return &LoadInputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}
