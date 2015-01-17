@@ -97,16 +97,16 @@ func InitInputModule(module Module, responseChan chan *ModuleMetrics) (chan int,
 	requestChan := make(chan int)
 
 	// Create a goroutine to listen for requests on the request channel
-	go func(module InputModule, requestChan chan int, responseChan chan *ModuleMetrics) {
+	go func(module InputModule, moduleName string, requestChan chan int, responseChan chan *ModuleMetrics) {
 		for _ = range requestChan {
 			metrics, err := module.GetMetrics()
 			if err != nil {
-				log.Print("Failed to retrieve metrics")
+				log.Printf("Failed to retrieve %s metrics: %v", moduleName, err)
 			} else {
 				responseChan <- metrics
 			}
 		}
-	}(inputModule, requestChan, responseChan)
+	}(inputModule, module.Name(), requestChan, responseChan)
 
 	return requestChan, nil
 }
@@ -131,6 +131,8 @@ func getModule(name string) Module {
 		return &ProcessesInputModule{}
 	case InternalModuleName:
 		return &InternalInputModule{}
+	case RedisModuleName:
+		return &RedisInputModule{}
 	default:
 		log.Fatalf("Invalid module: %s", name)
 	}

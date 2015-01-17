@@ -3,6 +3,11 @@
 	"GoVersion": "go1.4",
 	"Deps": [
 		{
+			"ImportPath": "github.com/fzzy/radix/redis",
+			"Comment": "v0.5.1",
+			"Rev": "27a863cdffdb0998d13e1e11992b18489aeeaa25"
+		},
+		{
 			"ImportPath": "golang.org/x/sys/unix",
 			"Rev": "c2a8d2745ffcadf2e453c5e4314d90d0bd5904cd"
 		},

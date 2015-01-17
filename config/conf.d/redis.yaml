@@ -1,0 +1,5 @@
+name: redis
+enabled: true
+settings:
+  host: localhost
+  port: 6379
